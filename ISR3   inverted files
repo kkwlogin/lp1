@@ -1,0 +1,43 @@
+# === Create sample text files ===
+texts = {
+    "file1.txt": "Artificial intelligence and machine learning are closely related fields.",
+    "file2.txt": "Deep learning is a subset of machine learning that uses neural networks.",
+    "file3.txt": "Information retrieval uses inverted files for fast document searching."
+}
+
+for name, content in texts.items():
+    with open(name, "w", encoding="utf-8") as f:
+        f.write(content)
+
+print("✅ Sample text files created successfully!")
+
+
+
+
+import string
+
+files = ["file1.txt", "file2.txt", "file3.txt"]
+
+
+
+index = {}
+for file in files:
+    text = open(file,"r" , encoding="utf-8").read().lower()
+    for p in string.punctuation: text = text.replace(p, " ")
+    for w in set(text.split()):
+        index.setdefault(w, []).append(file)
+
+print("✅ Inverted Index Created!\n")
+
+
+
+for term, docs in list(index.items())[:10]:
+    print(f"{term} → {docs}")
+
+
+
+q = input("\nEnter search term: ").lower().strip()
+print(f"\nFound in: {index.get(q, ['❌ No matching documents'])}")
+p=string.punctuation
+print(f"\nPunctuation characters: {p}")
+
