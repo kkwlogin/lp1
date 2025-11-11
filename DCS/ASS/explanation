@@ -1,0 +1,82 @@
+1) ArithmeticInterface.java
+import java.rmi.*;                                      // Import RMI base classes (Remote, RemoteException)
+public interface ArithmeticInterface extends Remote {    // Remote interface must extend Remote to be callable remotely
+    int add(int a, int b) throws RemoteException;        // Remote method signature — must declare throws RemoteException
+}
+
+2) ArithmeticImplementation.java
+import java.rmi.server.*;                               // Import UnicastRemoteObject to export remote object
+import java.rmi.*;                                      // Import RemoteException and other RMI utilities
+
+public class ArithmeticImplementation extends UnicastRemoteObject implements ArithmeticInterface {
+    // Constructor must throw RemoteException and call super() to export the object
+    ArithmeticImplementation() throws RemoteException { super(); }  // Export this remote object to accept incoming RMI calls
+
+    // Implementation of the remote method declared in the interface
+    public int add(int a, int b) {                                 // add() performs the arithmetic operation
+        System.out.println("Handled by thread: " + Thread.currentThread().getName()); // Show thread name to prove concurrency
+        return a + b;                                              // Return the sum back to the remote client
+    }
+}
+
+3) ArithmeticServer.java
+import java.rmi.*;                                        // Naming, RemoteException, etc.
+import java.rmi.registry.*;                               // LocateRegistry for creating registry in-process
+public class ArithmeticServer {
+    public static void main(String[] args) {
+        try {
+            LocateRegistry.createRegistry(1099);           // Create and start RMI registry on port 1099 inside this JVM
+            ArithmeticInterface obj = new ArithmeticImplementation(); // Create remote object instance
+            Naming.rebind("AddService", obj);              // Bind the object to the name "AddService" in registry
+            System.out.println("✅ Server Ready...");      // Inform that server is ready to accept clients
+        } catch (Exception e) {
+            System.out.println("❌ Server Error: " + e);   // Print any exception for debugging
+        }
+    }
+}
+
+4) ArithmeticClient.java
+import java.rmi.*;                                       // For Naming.lookup and RMI exceptions
+import java.util.*;                                      // For Scanner to read user input
+
+public class ArithmeticClient {
+    public static void main(String[] args) {
+        try {
+            Scanner sc = new Scanner(System.in);                           // Scanner reads numbers from console
+            ArithmeticInterface obj = (ArithmeticInterface) Naming.lookup("rmi://localhost/AddService"); // Lookup remote object from registry
+            System.out.print("Enter two numbers: ");                      // Prompt user
+            int a = sc.nextInt(), b = sc.nextInt();                       // Read two integers
+            System.out.println("Result = " + obj.add(a, b));              // Invoke remote method add() and print returned result
+            sc.close();                                                   // Close scanner (good practice)
+        } catch (Exception e) {
+            System.out.println("❌ Client Error: " + e);                  // Print exception (e.g., lookup failure, network error)
+        }
+    }
+}
+
+Minimum Java JDK: Java 8 — works fine.
+Recommended / LTS: Java 11 or Java 17 — stable and commonly used.
+Latest tested: Java 21 — also compatible.
+NetBeans: Any modern NetBeans (12+) will work. You can also use IntelliJ or Eclipse.
+No external libraries: RMI is part of Java SE; no third-party JARs needed.
+rmiregistry: Comes with the JDK (in JAVA_HOME/bin). But in this code we call LocateRegistry.createRegistry(1099) so you do not need to start rmiregistry manually — the server starts the registry inside its process.
+Compatibility summary:
+Java 8 → OK
+Java 11 → Recommended
+Java 17 → Recommended (LTS)
+Java 21 → OK
+ Option A — Run inside NetBeans (recommended for assignments)
+1.Put all four .java files into the default package under one project.
+2.Clean and Build the project (Right-click Project → Clean and Build).
+3.Run server:
+oRight-click ArithmeticServer.java → Run File (Shift+F6)
+oConsole should show: ✅ Server Ready...
+4.Run client #1:
+oRight-click ArithmeticClient.java → Run File
+oEnter numbers in the NetBeans input console when prompted
+5.Run client #2:
+oRight-click ArithmeticClient.java again → Run File (NetBeans opens a second Output tab for the second run)
+oEnter numbers there — both clients will be served concurrently.
+6.Observe server console: it prints thread names showing concurrency, e.g.:
+7.Handled by thread: RMI TCP Connection(1)-127.0.0.1
+Handled by thread: RMI TCP Connection(2)-127.0.0.1
