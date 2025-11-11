@@ -1,0 +1,63 @@
+Language Used	Java
+Java Version	Java 8 or above (JDK 8/11/17/21 – all OK)
+
+Then in terminal or command prompt:
+javac Berkeley.java
+java Berkeley
+
+javac Bully.java
+java Bully
+
+javac Ring.java
+java Ring
+
+🧠 Example Run — Berkeley
+Enter no. of clocks: 4
+Enter clock times:
+100 105 97 102
+
+Master clock: 100.0
+Average time: 101.0
+
+Adjustments:
+Clock 0: +1.00 -> 101.0
+Clock 1: -4.00 -> 101.0
+Clock 2: +4.00 -> 101.0
+Clock 3: -1.00 -> 101.0
+✅ Shows offsets and corrected time — full marks for synchronization.
+
+🧠 Example Run — Bully
+Enter no. of processes: 5
+Enter process IDs:
+1 2 3 4 5
+Enter initiator ID: 3
+
+Process 3 starts election
+Sending ELECTION to higher processes:
+  -> Process 4
+  -> Process 5
+
+Higher processes respond with OK
+Process 5 becomes coordinator
+
+*** COORDINATOR: 5 ***
+✅ Shows “ELECTION”, “OK”, and final “COORDINATOR” — full marks for leader election.
+
+🧠 Example Run — Ring
+Enter no. of processes: 5
+Enter process IDs in ring order:
+1 2 3 4 5
+Enter initiator ID: 2
+
+Process 2 starts election
+Election message travels through ring:
+  -> Process 2 (IDs collected: [2])
+  -> Process 3 (IDs collected: [2, 3])
+  -> Process 4 (IDs collected: [2, 3, 4])
+  -> Process 5 (IDs collected: [2, 3, 4, 5])
+  -> Process 1 (IDs collected: [2, 3, 4, 5, 1])
+
+Election message completed ring
+Highest ID: 5
+
+*** COORDINATOR: 5 ***
