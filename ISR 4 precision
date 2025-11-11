@@ -1,0 +1,76 @@
+import pandas as pd
+import math
+
+
+df = pd.read_excel("cranfield_q1_dataset.xlsx")
+
+
+
+df_q1 = df[df["Query ID"] == "q1"].sort_values("Rank")
+
+
+
+retrieved = df_q1["Document ID"].tolist()
+print(retrieved)
+relevant = (df_q1[df_q1["Is_Relevant"] == "Yes"]["Document ID"].tolist())
+print(relevant)
+
+
+
+def precision(retrieved, relevant):
+    if not retrieved: return 0
+    return sum(doc in relevant for doc in retrieved) / len(retrieved)
+
+
+
+def recall(retrieved, relevant):
+    if not relevant: return 0
+    return sum(doc in relevant for doc in retrieved) / len(relevant)
+
+
+
+def f_measure(p, r):
+    if (p + r) == 0: return 0
+    return 2 * p * r / (p + r)
+
+
+
+def e_measure(p, r, beta=1):
+    if p == 0 and r == 0: return 1
+    return 1 - ((1 + beta**2) * p * r) / (beta**2 * p + r)
+
+
+
+def dcg(retrieved, relevant):
+    return sum(1 / math.log2(i+2) for i, doc in enumerate(retrieved) if doc in relevant)
+
+
+
+def idcg(relevant, k):
+    return sum(1 / math.log2(i+2) for i in range(min(len(relevant), k)))
+
+
+
+
+def ndcg(retrieved, relevant):
+    dcg_val = dcg(retrieved, relevant)
+    idcg_val = idcg(relevant, len(retrieved))
+    return dcg_val / idcg_val if idcg_val > 0 else 0
+
+
+
+p = precision(retrieved, relevant)
+r = recall(retrieved, relevant)
+f = f_measure(p, r)
+e = e_measure(p, r)
+n = ndcg(retrieved, relevant)
+print("Precision:", round(p, 3))
+print("Recall:", round(r, 3))
+print("F-measure:", round(f, 3))
+print("E-measure:", round(e, 3))
+print("NDCG:", round(n, 3))
+
+
+
+
+
