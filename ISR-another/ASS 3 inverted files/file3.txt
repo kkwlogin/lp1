@@ -1,0 +1,1 @@
+Information retrieval uses inverted files for fast document searching.
