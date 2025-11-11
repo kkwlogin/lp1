@@ -1,0 +1,24 @@
+import requests  # For sending HTTP requests to API
+
+def get_weather(city_name):  # Function to get weather details of a city
+    api_key = "19f13522118354960c70f710129d42e9"  # OpenWeatherMap API key
+    api_url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}&units=metric"  # API endpoint with parameters
+    
+    response = requests.get(api_url)  # Send GET request
+    weather_data = response.json()  # Convert JSON response to dictionary
+
+    if weather_data.get("main"):  # If valid response is received
+        print(f"City: {weather_data['name']}")  # Print city name
+        print(f"Temperature: {weather_data['main']['temp']} °C")  # Print temperature
+        print(f"Wind Speed: {weather_data['wind']['speed']} m/s")  # Print wind speed
+        print(f"Description: {weather_data['weather'][0]['description']}")  # Print weather condition
+    else:
+        print("Error:", weather_data.get("message", "Could not fetch weather data."))  # Handle invalid city or API key
+
+# ---- Main Program ----
+city_input = input("Enter city name: ")  # Take city name as input
+get_weather(city_input)  # Call function
+
+
+
+
