@@ -1,0 +1,66 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+pages = int(input("How many pages to crawl: "))  # User input
+data = []  # Store all book info
+
+for i in range(1, pages + 1):
+    url = f"https://books.toscrape.com/catalogue/page-{i}.html"  # Page URL
+    try:
+        r = requests.get(url, timeout=10)  # Fetch page
+    except:
+        print(f"⚠️ Page {i} failed, skipping")  # Handle network issues
+        continue
+
+    soup = BeautifulSoup(r.text, "html.parser")  # Parse HTML
+    for p in soup.select(".product_pod"):
+        title = p.h3.a["title"].strip()  # Book title
+        raw_price = p.select_one(".price_color").text.strip()  # Raw price
+        price = raw_price.encode("latin1").decode("utf-8")  # Fix encoding (removes Â)
+        link = "https://books.toscrape.com/catalogue/" + p.h3.a["href"]  # Full product link
+        data.append({"Name": title, "Price": price, "Link": link})  # Add data to list
+    print(f"✅ Page {i} done")
+
+
+
+
+with open("books.csv", "w", newline="", encoding="utf-8-sig") as f:
+    writer = csv.DictWriter(f, fieldnames=["Name", "Price", "Link"])  # Define headers
+    writer.writeheader()  # ✅ Add headings
+    writer.writerows(data)  # Write all rows
+
+print(f"\n🎉 Done! Saved {len(data)} books to books.csv")
+
+
+
+
+
+
+#2
+
+
+import requests, csv
+from bs4 import BeautifulSoup
+
+pages = int(input("Pages: "))
+data = []
+
+for i in range(1, pages + 1):
+    try:
+        html = requests.get(f"https://books.toscrape.com/catalogue/page-{i}.html", timeout=10).text
+        soup = BeautifulSoup(html, "html.parser")
+    except:
+        continue
+
+    for p in soup.select(".product_pod"):
+        data.append({
+            "Name": p.h3.a["title"],
+            "Price": p.select_one(".price_color").text.replace("Â", ""),
+            "Link": "https://books.toscrape.com/catalogue/" + p.h3.a["href"]
+        })
+
+with open("books1.csv", "w", newline="", encoding="utf-8-sig") as f:
+    csv.DictWriter(f, ["Name", "Price", "Link"]).writerows(data)
+
+print(f"✅ Saved {len(data)} books")
