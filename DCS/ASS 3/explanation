@@ -1,0 +1,100 @@
+🧰 Step 1: Install MinGW-w64 (GCC Compiler)
+1.Go to the official site:
+👉 https://winlibs.com
+2.Download this file (scroll to “Latest Release”):
+“MinGW-w64 GCC – 64-bit” → ZIP archive (e.g. mingw-w64-clang-x86_64-....zip)
+3.Extract it anywhere, for example:
+4.C:\mingw64
+5.Inside it, there should be folders like:
+6.C:\mingw64\bin
+7.C:\mingw64\lib
+8.C:\mingw64\include
+✅ This bin folder contains gcc.exe, g++.exe, gdb.exe.
+
+🪄 Step 2: Add MinGW to System PATH
+1.Press Windows + R → type sysdm.cpl → Enter
+2.Go to Advanced → Environment Variables
+3.Under System variables, find Path, click Edit → New
+4.Paste the path:
+5.C:\mingw64\bin
+6.Click OK → OK → OK
+
+🧾 Step 3: Verify Installation
+1.Open Command Prompt (CMD)
+2.Run:
+3.gcc --version
+✅ You should see something like:
+gcc (MinGW-W64 ...) 13.1.0
+If yes → compiler works perfectly.
+
+💻 Step 4: Install VS Code
+1.Download from 👉 https://code.visualstudio.com/
+2.Install it (normal defaults are fine)
+
+🔌 Step 5: Add Extensions in VS Code
+Open VS Code → Go to Extensions (Ctrl+Shift+X)
+Search and install:
+✅ C/C++ (by Microsoft)
+✅ Code Runner (optional but helpful for running easily)
+
+🧩 Step 6: Create Your Project Folder
+1.Make a new folder, e.g.
+2.C:\Users\<YourName>\Desktop\OpenMP_Project
+3.Open that folder in VS Code
+4.Inside, create a new file:
+5.openmp_sum_min_comment.c
+6.Paste this final code (same as before):
+
+✅ Final Code (short, with comments)
+#include <stdio.h>      // for input/output
+#include <omp.h>        // for OpenMP functions
+
+int main() {
+    int N, i, total = 0;                         // N = array size, total = final sum
+    printf("Enter number of elements: ");        
+    scanf("%d", &N);                             // take user input for N
+
+    int a[N];                                    // declare array of size N
+    printf("Enter %d elements:\n", N);
+    for(i=0;i<N;i++) scanf("%d",&a[i]);          // read all elements
+
+    int t;                                       // number of threads
+    printf("Enter number of threads: ");
+    scanf("%d",&t);                              // take user input for thread count
+
+    #pragma omp parallel num_threads(t)          // create t threads for parallel execution
+    {
+        int id = omp_get_thread_num();           // get current thread ID
+        int nT = omp_get_num_threads();          // get total threads
+        int start = id*(N/nT);                   // start index for this thread
+        int end = (id==nT-1)? N : start + (N/nT);// last thread may take extra elements
+        int sum = 0;                             // local sum for this thread
+
+        for(i=start;i<end;i++) sum += a[i];      // calculate local sum
+        printf("Thread %d -> sum=%d\n",id,sum);  // print partial (intermediate) sum
+
+        #pragma omp atomic                      // prevent race condition when updating total
+        total += sum;                            // add local sum to total safely
+    }
+
+    printf("Total = %d\n", total);               // print final total sum
+    return 0;                                    // end of program
+}
+
+🧮 Step 7: Compile & Run from Terminal
+Inside VS Code terminal (press Ctrl + ~), type:
+gcc -fopenmp ass3.c -o sum.exe
+gcc -fopenmp filename.c -o output.exe
+✅ This compiles the program with OpenMP support.
+Then run it:
+.\sum.exe
+
+🧩 Example Run
+Enter number of elements: 8
+Enter 8 elements:
+1 2 3 4 5 6 7 8
+Enter number of threads: 3
+Thread 0 -> sum=5
+Thread 1 -> sum=9
+Thread 2 -> sum=22
+Total = 36
