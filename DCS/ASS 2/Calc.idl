@@ -1,0 +1,7 @@
+interface Calc {
+  long long add(in long long a, in long long b);     // addition
+  long long sub(in long long a, in long long b);     // subtraction
+  long long mul(in long long a, in long long b);     // multiplication
+  double div(in long long a, in long long b);        // division (returns double)
+};
+
