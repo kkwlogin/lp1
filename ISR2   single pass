@@ -1,0 +1,64 @@
+# === Create Example Text Files for Single-Pass Clustering ===
+
+texts = {
+    "file1.txt": "Machine learning is a branch of artificial intelligence.",
+    "file2.txt": "Artificial intelligence and machine learning are related fields.",
+    "file3.txt": "Football is the most popular sport in the world.",
+    "file4.txt": "Cricket and football are played all over the world.",
+    "file5.txt": "Python is used for data science and machine learning."
+}
+for filename, content in texts.items():
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(content)
+        print(f"{filename} created successfully.")
+
+print("\nAll 5 files created in current directory ✅")
+
+
+
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+
+
+filenames = ["file1.txt", "file2.txt", "file3.txt", "file4.txt", "file5.txt"]
+
+
+
+documents = [open(f, "r", encoding="utf-8").read() for f in filenames]
+
+
+
+
+vectorizer = TfidfVectorizer(stop_words="english")
+tfidf = vectorizer.fit_transform(documents)
+
+
+
+
+THRESHOLD = 0.3
+
+
+
+clusters, centroids = [], []
+
+for i, vec in enumerate(tfidf):
+    assigned = False
+    for j, c in enumerate(centroids):
+        sim = cosine_similarity(vec, c)[0][0]
+        if sim >= THRESHOLD:
+            clusters[j].append(filenames[i])
+            centroids[j] = (centroids[j] + vec) / 2
+            assigned = True
+            break
+    if not assigned:
+        clusters.append([filenames[i]])
+        centroids.append(vec)
+
+
+
+for i, c in enumerate(clusters, 1):
+    print(f"Cluster {i}: {c}") 
+
