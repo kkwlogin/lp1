@@ -1,0 +1,75 @@
+⚙️ Requirements
+Requirement	Details
+Language	Java (JDK 8 recommended)
+Libraries used	javax.jws.*, javax.xml.ws.*
+Tools/Commands	javac, java, wsimport
+Runs on	Offline (localhost)
+Concept	SOAP Web Service using JAX-WS
+Output	Adds two integers sent from client
+
+🧩 File 1 – Service.java (Server / Web Service)
+import javax.jws.*;                                   // Import JAX-WS annotations
+import javax.xml.ws.Endpoint;                         // Used to publish the web service
+
+@WebService(targetNamespace = "http://myservice/")    // Define SOAP service + namespace
+public class Service {
+
+    @WebMethod                                         // Make this method remotely accessible
+    public int add(int a, int b) {                     // Method performs addition
+        return a + b;                                  // Return sum to client
+    }
+
+    public static void main(String[] args) {
+        // Publish the web service locally at given URL
+        Endpoint.publish("http://localhost:8080/calc", new Service());  // Start SOAP service
+        System.out.println("Service running at: http://localhost:8080/calc?wsdl"); // Display WSDL link
+    }
+}
+
+🧩 File 2 – Client.java (Client / Distributed Application)
+// ===== SOAP Client (Fixed Version) =====
+import java.net.URL;                                   // For connecting to WSDL URL
+import javax.xml.namespace.QName;                      // For unique service identification
+import javax.xml.ws.Service;                           // JAX-WS Service class to access server
+import java.util.Scanner;                              // To take user input
+
+public class Client {
+    public static void main(String[] args) throws Exception {
+        // URL where the WSDL is available (server must be running)
+        URL url = new URL("http://localhost:8080/calc?wsdl");  // Web service description location
+
+        // QName(namespaceURI, serviceName) — must match values from server
+        QName qname = new QName("http://myservice/", "ServiceService");  // Identify the web service
+
+        // Create a reference to the published service
+        Service service = Service.create(url, qname);  // Create connection to the WSDL
+
+        // Get the proxy (stub) to call remote methods
+        myservice.Service calc = service.getPort(myservice.Service.class);  // Access remote Service interface
+
+        // Take user input for addition
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter two numbers: ");       // Prompt for numbers
+        int a = sc.nextInt(), b = sc.nextInt();        // Read numbers
+
+        // Invoke remote method and print result
+        System.out.println("Sum = " + calc.add(a, b)); // Remote method call & display output
+    }
+}
+
+▶️ How to Compile and Run (Offline)
+🖥️ Step 1 – Compile and Run the Server
+javac Service.java
+java Service
+Output →
+Service running at: http://localhost:8080/calc?wsdl
+Keep this terminal open (service keeps running).
+
+🖥️ Step 2 – Generate Client Stub and Run Client
+Open a new terminal in the same folder:
+wsimport -keep http://localhost:8080/calc?wsdl   # Generates stub classes under myservice/
+javac Client.java                                # Compile client
+java Client                                      # Run client
+Expected Output →
+Enter two numbers: 5 7
+Sum = 12
