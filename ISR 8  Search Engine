@@ -1,0 +1,47 @@
+import os, re 
+
+
+path = "website/"                       
+index = {} 
+
+
+for file in os.listdir(path):            # Loop through each file inside 'website' folder
+    if file.endswith(".html"):           # Only process files ending with .html
+        text = open(path + file, encoding="utf-8").read()   # Read file content as text
+        words = re.findall(r'\w+', text.lower())            # Extract all words & convert to lowercase
+        for w in set(words):             # Use 'set' to avoid duplicate words from same file
+            index.setdefault(w, []).append(file)
+
+
+
+query = input("Enter search term: ").lower()
+
+
+print("\nSearch Results:")              # Print heading for clarity
+print(index.get(query, ["No match found"]))
+
+
+
+#2
+
+
+import os, re                            # os for file handling, re for regular expressions
+
+# -------- Step 1: Set folder path --------
+path = "website/"                        # Folder containing our HTML files
+index = {}                               # Dictionary to store word-to-file mapping (inverted index)
+
+# -------- Step 2: Read and index HTML files --------
+for file in os.listdir(path):            # Loop through each file inside 'website' folder
+    if file.endswith(".html"):           # Only process files ending with .html
+        text = open(path + file, encoding="utf-8").read()   # Read file content as text
+        words = re.findall(r'\w+', text.lower())            # Extract all words & convert to lowercase
+        for w in set(words):             # Use 'set' to avoid duplicate words from same file
+            index.setdefault(w, []).append(file)  # Add word to dictionary; append current file name
+
+# -------- Step 3: Accept user query --------
+query = input("Enter search term: ").lower()    # Take user input and convert to lowercase
+
+# -------- Step 4: Display results --------
+print("\nSearch Results:")              # Print heading for clarity
+print(index.get(query, ["No match found"]))  # Show matching files or message if not found
