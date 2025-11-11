@@ -1,0 +1,63 @@
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+import string
+
+
+
+nltk.download('punkt')  
+nltk.download('punkt_tab')
+nltk.download('stopwords')
+nltk.download('wordnet')
+
+
+
+# Step 1: Read input text file
+filename = "Conflation.txt"   # <-- use your own text file
+with open(filename, 'r', encoding='utf-8') as file:
+    text = file.read()
+
+print("Original Text:\n", text)
+print("-" * 80)
+
+
+
+tokens = word_tokenize(text.lower())
+
+
+stop_words = set(stopwords.words('english'))
+tokens = [word for word in tokens if word.isalpha() and word not in stop_words]
+
+
+stemmer = PorterStemmer()
+stemmed_words = [stemmer.stem(word) for word in tokens]
+
+
+lemmatizer = WordNetLemmatizer()
+lemmatized_words = [lemmatizer.lemmatize(word) for word in tokens]
+
+
+
+# Step 6: Display results
+print("After Stemming:\n", ' '.join(stemmed_words))
+print("-" * 80)
+print("After Lemmatization:\n", ' '.join(lemmatized_words))
+print("-" * 80)
+
+
+
+from collections import Counter
+freq = Counter(stemmed_words)
+print("Document Representative (Word Frequency):")
+for word, count in freq.most_common(10):
+    print(f"{word}: {count}")
+
+
+
+
+filename = "Conflation.txt"   # <-- use your own text file
+with open(filename, 'r', encoding='utf-8') as file:
+    text = file.read()
+print("Original Text:\n", text)
+print("-" * 80)
